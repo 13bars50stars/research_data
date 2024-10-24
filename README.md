@@ -44,6 +44,28 @@ Conclusion
 
 TODO: extract client algorithms each software used - maybe in Appendix for space saving?
 
-## Scenario 02 - [HASSH] Server Response to Client Connection
+## Scenario 02 - [HASSH] Server Response to Different Client Connections
 
+Summary: Examine HASSHserver results when different SSH client software is used to connect to bastion. PCAPs are copied from Scenario01.
 
+```bash
+$ tshark -nr scenario02_putty_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hasshserver
+7	192.168.91.132	192.168.91.129	Client: Key Exchange Init	
+8	192.168.91.129	192.168.91.132	Server: Key Exchange Init	a65c3b91f743d3f246e72172e77288f1
+```
+
+```bash
+$ tshark -nr scenario02_ms_terminal_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hasshserver
+7	192.168.91.132	192.168.91.129	Client: Key Exchange Init	
+8	192.168.91.129	192.168.91.132	Server: Key Exchange Init	a65c3b91f743d3f246e72172e77288f1
+```
+TODO: extract server algorithms each software used - maybe in Appendix for space saving?
+
+Conclusion
+
+| HASSHserver Value    | Client Software       |
+|----------------|----------------|
+|  a65c3b91f743d3f246e72172e77288f1 | PuTTY  |
+|  a65c3b91f743d3f246e72172e77288f1 | MS Terminal ssh  |
+
+hasshServer remains constant regardless of client connection
