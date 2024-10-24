@@ -204,7 +204,73 @@ $ ja4 scenario04_nopatch.pcap -J
 <details>
   <summary>Expand to see details</summary>
 
+Summary: Simulate an unauthorized file copy using SCP from UserPC to Bastion. File copied in example is linpeas.sh without any obfuscation or armoring.
 
+Systems used:
+
+  - User PC - 192.168.91.132 (Windows 10 using MS Terminal ssh)
+  - Bastion - 192.168.91.129 (Debian12)
+
+File details for `linpeas.sh` on UserPC
+```bash
+PS C:\Users\Bob> ls -l linpeas.sh
+
+
+    Directory: C:\Users\Bob
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        10/15/2024  12:05 PM         824745 linpeas.sh
+```
+
+Execute SCP command to simulate unauthorized file copy to Bastion
+
+```bash
+$ scp linpeas.sh bob@bastion:~/
+```
+
+<details>
+<summary>PCAP Filter</summary>
+
+```bash
+tcpdump -ni ens33 'tcp and port 22' -w scenario04.pcap
+```
+</details>
+
+
+
+Conclusion:
+The file chosen is 824745 bytes. The MTU for this network is 1500 bytes. As the Secure Copy (SCP) process encrypts the file and sends over SSH, the JA4+SSH fingerprint value detects the SSH payload as 1460 bytes, allowing 20 bytes for the IP and TCP header values.
+
+```json
+$ ja4 scenario05.pcap -J
+{
+    "stream": 0,
+    "src": "192.168.91.132",
+    "dst": "192.168.91.129",
+    "srcport": "49826",
+    "dstport": "22",
+    "client_ttl": "128",
+    "server_ttl": "64",
+    "JA4L-S": "9_64",
+    "JA4L-C": "1327_128",
+    "ssh_extras": {
+        "hassh": "ec7378c1a92f5a8dde7e8b7a1ddf33d1",
+        "hassh_server": "a65c3b91f743d3f246e72172e77288f1",
+        "ssh_protocol_client": "SSH-2.0-OpenSSH_for_Windows_8.1",
+        "ssh_protocol_server": "SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u3",
+        "encryption_algorithm": "chacha20-poly1305@openssh.com"
+    },
+    "JA4SSH.1": "c1460s36_c185s15_c4s131",
+    "JA4SSH.2": "c1460s36_c0s0_c0s1"
+}
+```
+
+| JA4+SSH Value    | Simulated Activity       |
+|----------------|----------------|
+|  c36s36_c10s10_c10s0 | Forward Interactive Shell   |
+|  c1460s36_c185s15_c4s131 | Unauthorized SCP to Bastion  |
 
 </details>
 
