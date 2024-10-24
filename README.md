@@ -234,14 +234,15 @@ $ scp linpeas.sh bob@bastion:~/
 <summary>PCAP Filter</summary>
 
 ```bash
-tcpdump -ni ens33 'tcp and port 22' -w scenario04.pcap
+tcpdump -ni ens33 'tcp and port 22' -w scenario05.pcap
 ```
 </details>
 
 
 
 Conclusion:
-The file chosen is 824745 bytes. The MTU for this network is 1500 bytes. As the Secure Copy (SCP) process encrypts the file and sends over SSH, the JA4+SSH fingerprint value detects the SSH payload as 1460 bytes, allowing 20 bytes for the IP and TCP header values.
+
+The file chosen is 824745 bytes. The MTU for this network is 1500 bytes. As the Secure Copy (SCP) process encrypts the file and sends over SSH, the JA4+SSH fingerprint value detects the SSH payload as 1460 bytes, allowing 20 bytes for the IP and TCP header values. Previously, the SSH payload was padded to 36 bytes based on the encryption algorithms used in the connection.
 
 ```json
 $ ja4 scenario05.pcap -J
