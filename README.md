@@ -1,5 +1,6 @@
 ## Scenario 01 - [HASSH] SSH Client Software Connection to Bastion
-
+<details>
+  <summary>Expand to see details</summary>
 Summary: Examine HASSH results when different SSH client software is used to connect to bastion
 
 Connect from User PC to Bastion with username bob
@@ -49,8 +50,11 @@ Using different client software on UserPC produces different HASSH values. There
 
 TODO: extract client algorithms each software used - maybe in Appendix for space saving?
 
-## Scenario 02 - [HASSH] Server Response to Different Client Connections
+</details>
 
+## Scenario 02 - [HASSH] Server Response to Different Client Connections
+<details>
+  <summary>Expand to see details</summary>
 Summary: Examine HASSHserver results when different SSH client software is used to connect to bastion. PCAPs are copied from Scenario01.
 
 Extract HASSHserver with tshark
@@ -77,8 +81,11 @@ hasshServer remains constant regardless of client connection
 |  a65c3b91f743d3f246e72172e77288f1 | PuTTY  |
 |  a65c3b91f743d3f246e72172e77288f1 | MS Terminal ssh  |
 
-## Scenario 03 - [HASSH] Connect Bastion to Defended Server 
+</details>
 
+## Scenario 03 - [HASSH] Connect Bastion to Defended Server 
+<details>
+  <summary>Expand to see details</summary>
 Summary: Use either PuTTY or MS Terminal ssh to establish connection from UserPC to Bastion. Establish connection from Bastion to Defended Server. Examine HASSH and HASSHserver for Bastion to Defended Server.
 
   - User PC - 192.168.91.132 (Windows 10)
@@ -119,3 +126,5 @@ Note: sshd_config is the same on both Bastion and Defended Server, resulting in 
 |----------------|----------------|
 |  a65c3b91f743d3f246e72172e77288f1 | Scenario02 Bastion HASSHserver  |
 |  a65c3b91f743d3f246e72172e77288f1 | Scenario03 Defended Server HASSHserver  |
+
+</details>
