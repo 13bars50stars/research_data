@@ -35,7 +35,7 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
   ```
 </details>
 
-Conclusion
+### Conclusion
 
 | HASSH Value    | SSH Client Software       |
 |----------------|----------------|
@@ -61,7 +61,7 @@ $ tshark -nr scenario02_ms_terminal_short.pcap -Y 'ssh.message_code == 20' -T fi
 ```
 TODO: extract server algorithms each software used - maybe in Appendix for space saving?
 
-Conclusion
+### Conclusion
 
 | HASSHserver Value    | SSH Client Software       |
 |----------------|----------------|
@@ -92,7 +92,7 @@ $ tshark -nr scenario03.pcap -Y 'ssh.message_code == 20 and ip.addr == 192.168.9
 49	192.168.91.133	192.168.91.129	Server: Key Exchange Init	a65c3b91f743d3f246e72172e77288f1
 ```
 
-Conclusion:
+### Conclusion:
 
 Client HASSH uses SSH software on Bastion installed by Debian12. This `aae6b9604f6f3356543709a376d7f657` is different from PuTTY HASSH `1dd4d89cd6b7a1f7b06acf808260c130` and MS Terminal ssh HASSH `ec7378c1a92f5a8dde7e8b7a1ddf33d1`
 
