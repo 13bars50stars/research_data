@@ -128,3 +128,27 @@ Note: sshd_config is the same on both Bastion and Defended Server, resulting in 
 |  a65c3b91f743d3f246e72172e77288f1 | Scenario03 Defended Server HASSHserver  |
 
 </details>
+
+## Scenario 04 - [JA4+SSH] Normal Behavior - Forward Interactive Shell to Bastion
+<details>
+  <summary>Expand to see details</summary>
+
+
+
+</details>
+
+## Scenario 05 - [JA4+SSH] Unauthorized File Copy to Bastion - linpeas.sh
+<details>
+  <summary>Expand to see details</summary>
+
+
+
+</details>
+
+## Scenario 06 - [JA4+SSH] Data Exfil from Bastion - loot.gz
+<details>
+  <summary>Expand to see details</summary>
+
+
+
+</details>
