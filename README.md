@@ -15,6 +15,8 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
 
 <details>
   <summary>PuTTY Client Connection</summary>
+  
+  Extract HASSH for `PuTTY` with tshark
 
   ```bash
   $ tshark -nr scenario01_putty_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hassh
@@ -28,6 +30,7 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
 <details>
   <summary>MS Terminal SSH Client</summary>
   
+  Extract HASSH for `MS Terminal ssh` with tshark
   ```bash
   $ tshark -nr scenario01_ms_terminal_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hassh
 7	192.168.91.132	192.168.91.129	Client: Key Exchange Init	ec7378c1a92f5a8dde7e8b7a1ddf33d1
@@ -50,12 +53,14 @@ TODO: extract client algorithms each software used - maybe in Appendix for space
 
 Summary: Examine HASSHserver results when different SSH client software is used to connect to bastion. PCAPs are copied from Scenario01.
 
+Extract HASSHserver with tshark
 ```bash
 $ tshark -nr scenario02_putty_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hasshserver
 7	192.168.91.132	192.168.91.129	Client: Key Exchange Init	
 8	192.168.91.129	192.168.91.132	Server: Key Exchange Init	a65c3b91f743d3f246e72172e77288f1
 ```
 
+Extract HASSHserver with tshark
 ```bash
 $ tshark -nr scenario02_ms_terminal_short.pcap -Y 'ssh.message_code == 20' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hasshserver
 7	192.168.91.132	192.168.91.129	Client: Key Exchange Init	
@@ -81,12 +86,14 @@ Summary: Use either PuTTY or MS Terminal ssh to establish connection from UserPC
   - Defended Server - 192.168.91.133 (Debain12)
 
 <details>
-  <summary>PCAP Filter</summary>
+<summary>PCAP Filter</summary>
+
 ```bash
 tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
 ```
 </details>
 
+Extract HASSH and HASSHserver with tshark
 
 ```bash
 $ tshark -nr scenario03.pcap -Y 'ssh.message_code == 20 and ip.addr == 192.168.91.133' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hassh -e ssh.kex.hasshserver
