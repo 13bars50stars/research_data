@@ -279,6 +279,75 @@ $ ja4 scenario05.pcap -J
 <details>
   <summary>Expand to see details</summary>
 
+Summary: Simulate data exfiltration from Bastion. Secure Copy (SCP) a file from Bastion to UserPC. A generated file on Bastion host is SCP to UserPC.
 
+Systems used:
+
+  - User PC - 192.168.91.132 (Windows 10 using MS Terminal ssh)
+  - Bastion - 192.168.91.129 (Debian12)
+
+<details>
+<summary>Generate `loot.gz` file for data exfiltration simulation on Bastion</summary>
+
+```bash
+$ dd if=/dev/urandom of=loot bs=1M count=1
+1+0 records in
+1+0 records out
+1048576 bytes (1.0 MB, 1.0 MiB) copied, 0.00341959 s, 307 MB/s
+$ gzip loot
+$ ls -l loot.gz
+-rw-r--r-- 1 bob bob 10487383 Oct 19 16:23 loot.gz
+```
+</details>
+
+
+Execute SCP command to simulate unauthorized file copy to Bastion
+
+```bash
+$ scp bob@bastion:~/loot.gz .
+```
+
+<details>
+<summary>PCAP Filter</summary>
+
+```bash
+tcpdump -ni ens33 'tcp and port 22' -w scenario06.pcap
+```
+</details>
+
+Conclusion:
+
+Similar to Scenario05, we see the server (Bastion) is the one sending data via SSH with very few client interactions. As the Secure Copy (SCP) process encrypts the file and sends over SSH, the JA4+SSH fingerprint value detects the SSH payload as 1460 bytes, allowing 20 bytes for the IP and TCP header values. Previously, the SSH payload was padded to 36 bytes based on the encryption algorithms used in the connection.
+
+```json
+$ ja4 scenario06.pcap -J
+{
+    "stream": 0,
+    "src": "192.168.91.132",
+    "dst": "192.168.91.129",
+    "srcport": "49897",
+    "dstport": "22",
+    "client_ttl": "128",
+    "server_ttl": "64",
+    "JA4L-S": "9_64",
+    "JA4L-C": "1391_128",
+    "ssh_extras": {
+        "hassh": "ec7378c1a92f5a8dde7e8b7a1ddf33d1",
+        "hassh_server": "a65c3b91f743d3f246e72172e77288f1",
+        "ssh_protocol_client": "SSH-2.0-OpenSSH_for_Windows_8.1",
+        "ssh_protocol_server": "SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u3",
+        "encryption_algorithm": "chacha20-poly1305@openssh.com"
+    },
+    "JA4SSH.1": "c60s1460_c11s189_c13s3",
+    "JA4SSH.2": "c60s1460_c0s200_c10s0",
+    "JA4SSH.3": "c36s1460_c3s197_c10s0"
+}
+```
+
+| JA4+SSH Value    | Simulated Activity       |
+|----------------|----------------|
+|  c36s36_c10s10_c10s0 | Forward Interactive Shell   |
+|  c1460s36_c185s15_c4s131 | Unauthorized SCP to Bastion  |
+|  c60s1460_c0s200_c10s0  | Data Exfiltration from Bastion      |
 
 </details>
