@@ -37,6 +37,8 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
 
 ### Conclusion
 
+Using different client software on UserPC produces different HASSH values. There is a difference between PuTTY and MS Terminal ssh.
+
 | HASSH Value    | SSH Client Software       |
 |----------------|----------------|
 | 1dd4d89cd6b7a1f7b06acf808260c130  | PuTTY  |
@@ -63,12 +65,12 @@ TODO: extract server algorithms each software used - maybe in Appendix for space
 
 ### Conclusion
 
+hasshServer remains constant regardless of client connection
+
 | HASSHserver Value    | SSH Client Software       |
 |----------------|----------------|
 |  a65c3b91f743d3f246e72172e77288f1 | PuTTY  |
 |  a65c3b91f743d3f246e72172e77288f1 | MS Terminal ssh  |
-
-hasshServer remains constant regardless of client connection
 
 ## Scenario 03 - [HASSH] Connect Bastion to Defended Server 
 
