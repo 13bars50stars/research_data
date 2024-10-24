@@ -96,7 +96,7 @@ Summary: Use either PuTTY or MS Terminal ssh to establish connection from UserPC
 <summary>PCAP Filter</summary>
 
 ```bash
-tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
+tcpdump -ni ens33 'tcp and port 22' -w scenario03.pcap
 ```
 </details>
 
@@ -132,8 +132,66 @@ Note: sshd_config is the same on both Bastion and Defended Server, resulting in 
 ## Scenario 04 - [JA4+SSH] Normal Behavior - Forward Interactive Shell to Bastion
 <details>
   <summary>Expand to see details</summary>
+Summary: Connect from UserPC to Bastion using either UserPC SSH client software. Perform typical system administator commands such as checking system information.
 
+System commands executed on Bastion:
+```bash
+pwd
+whoami
+cat /etc/os-release
+uptime
+uname -a
+who
+exit
+```
 
+<details>
+<summary>PCAP Filter</summary>
+
+```bash
+tcpdump -ni ens33 'tcp and port 22' -w scenario04.pcap
+```
+</details>
+
+Modify JA4.py script to calculate JA4+SSH values based on 20 SSH Packets. JA4.py by default will monitor 200 packets before calculating fingerprint. Modification is required because of the limited number of commands entered on the host.
+
+Modify line 406 in script:
+https://github.com/FoxIO-LLC/ja4/blob/main/python/ja4.py#L406
+
+Conclusion:
+
+JA4+SSH prints JA4SSH.x values indicating expected forward interactive shell. Each keystroke is encrypted on the client and sent to the server. A TCP ACK is sent acknowledging the encrypted packet from the client. Thus, the JA4+SSH fingerprint - c36s36_xxxx_xxxx
+
+```json
+$ ja4 scenario04_nopatch.pcap -J
+{
+    "stream": 0,
+    "src": "192.168.91.132",
+    "dst": "192.168.91.129",
+    "srcport": "49765",
+    "dstport": "22",
+    "client_ttl": "128",
+    "server_ttl": "64",
+    "JA4L-S": "8_64",
+    "JA4L-C": "1225_128",
+    "ssh_extras": {
+        "hassh": "ec7378c1a92f5a8dde7e8b7a1ddf33d1",
+        "hassh_server": "a65c3b91f743d3f246e72172e77288f1",
+        "ssh_protocol_client": "SSH-2.0-OpenSSH_for_Windows_8.1",
+        "ssh_protocol_server": "SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u3",
+        "encryption_algorithm": "chacha20-poly1305@openssh.com"
+    },
+    "JA4SSH.1": "c33s44_c9s11_c4s3",
+    "JA4SSH.2": "c36s36_c9s11_c10s0",
+    "JA4SSH.3": "c36s36_c9s11_c10s0",
+    "JA4SSH.4": "c36s36_c10s10_c10s0",
+    "JA4SSH.5": "c36s36_c8s12_c10s0",
+    "JA4SSH.6": "c36s36_c8s12_c10s0",
+    "JA4SSH.7": "c36s36_c7s13_c8s0",
+    "JA4SSH.8": "c36s36_c7s13_c10s0",
+    "JA4SSH.9": "c36s36_c0s0_c0s1"
+}
+```
 
 </details>
 
