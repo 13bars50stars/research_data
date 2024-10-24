@@ -37,7 +37,7 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
 
 Conclusion
 
-| HASSH Value    | Software       |
+| HASSH Value    | SSH Client Software       |
 |----------------|----------------|
 | 1dd4d89cd6b7a1f7b06acf808260c130  | PuTTY  |
 | ec7378c1a92f5a8dde7e8b7a1ddf33d1  | MS Terminal ssh  |
@@ -63,9 +63,50 @@ TODO: extract server algorithms each software used - maybe in Appendix for space
 
 Conclusion
 
-| HASSHserver Value    | Client Software       |
+| HASSHserver Value    | SSH Client Software       |
 |----------------|----------------|
 |  a65c3b91f743d3f246e72172e77288f1 | PuTTY  |
 |  a65c3b91f743d3f246e72172e77288f1 | MS Terminal ssh  |
 
 hasshServer remains constant regardless of client connection
+
+## Scenario 03 - [HASSH] Connect Bastion to Defended Server 
+
+Summary: Use either PuTTY or MS Terminal ssh to establish connection from UserPC to Bastion. Establish connection from Bastion to Defended Server. Examine HASSH and HASSHserver for Bastion to Defended Server.
+
+  - User PC - 192.168.91.132 (Windows 10)
+  - Bastion - 192.168.91.129 (Debian12)
+  - Defended Server - 192.168.91.133 (Debain12)
+
+<details>
+  <summary>PCAP Filter</summary>
+```bash
+tcpdump -ni ens33 'tcp and port 22' -w scenario01.pcap
+```
+</details>
+
+
+```bash
+$ tshark -nr scenario03.pcap -Y 'ssh.message_code == 20 and ip.addr == 192.168.91.133' -T fields -e frame.number -e ip.src -e ip.dst -e _ws.col.Info -e ssh.kex.hassh -e ssh.kex.hasshserver
+48	192.168.91.129	192.168.91.133	Client: Key Exchange Init	aae6b9604f6f3356543709a376d7f657	
+49	192.168.91.133	192.168.91.129	Server: Key Exchange Init	a65c3b91f743d3f246e72172e77288f1
+```
+
+Conclusion:
+
+Client HASSH uses SSH software on Bastion installed by Debian12. This `aae6b9604f6f3356543709a376d7f657` is different from PuTTY HASSH `1dd4d89cd6b7a1f7b06acf808260c130` and MS Terminal ssh HASSH `ec7378c1a92f5a8dde7e8b7a1ddf33d1`
+
+| HASSH Value    | SSH Client Software       |
+|----------------|----------------|
+| 1dd4d89cd6b7a1f7b06acf808260c130  | PuTTY  |
+| ec7378c1a92f5a8dde7e8b7a1ddf33d1  | MS Terminal ssh  |
+| aae6b9604f6f3356543709a376d7f657  | OpenSSH Client from Bastion host |
+
+Server HASSHserver `a65c3b91f743d3f246e72172e77288f1` remains constant from Scenario02.
+
+Note: sshd_config is the same on both Bastion and Defended Server, resulting in same HASSHserver
+
+| HASSHserver Value    | SSH Client Software       |
+|----------------|----------------|
+|  a65c3b91f743d3f246e72172e77288f1 | Scenario02 Bastion HASSHserver  |
+|  a65c3b91f743d3f246e72172e77288f1 | Scenario03 Defended Server HASSHserver  |
