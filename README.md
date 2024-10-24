@@ -317,7 +317,7 @@ tcpdump -ni ens33 'tcp and port 22' -w scenario06.pcap
 
 Conclusion:
 
-Similar to Scenario05, we see the server (Bastion) is the one sending data via SSH with very few client interactions. As the Secure Copy (SCP) process encrypts the file and sends over SSH, the JA4+SSH fingerprint value detects the SSH payload as 1460 bytes, allowing 20 bytes for the IP and TCP header values. Previously, the SSH payload was padded to 36 bytes based on the encryption algorithms used in the connection.
+Similar to Scenario05, the server (Bastion) is the one sending data via SSH with very few client interactions. The JA4+SSH fingerprint value accurately represents this scenario.
 
 ```json
 $ ja4 scenario06.pcap -J
