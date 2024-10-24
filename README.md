@@ -134,6 +134,11 @@ Note: sshd_config is the same on both Bastion and Defended Server, resulting in 
   <summary>Expand to see details</summary>
 Summary: Connect from UserPC to Bastion using either UserPC SSH client software. Perform typical system administator commands such as checking system information.
 
+Systems used:
+
+  - User PC - 192.168.91.132 (Windows 10 using MS Terminal ssh)
+  - Bastion - 192.168.91.129 (Debian12)
+
 System commands executed on Bastion:
 ```bash
 pwd
