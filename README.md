@@ -420,7 +420,6 @@ Similar to previous scenarios, chacha20-poly1305 is the chosen algorithm. Each k
 
 ```json
 $ ja4 scenario07.pcap -J
-analyst@watchingu:~$ ja4 scenario07.pcap -J
 {
     "stream": 0,
     "src": "192.168.91.133",
