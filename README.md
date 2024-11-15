@@ -351,3 +351,119 @@ $ ja4 scenario06.pcap -J
 |  c60s1460_c0s200_c10s0  | Data Exfiltration from Bastion      |
 
 </details>
+
+## Scenario 07 - [JA4+SSH] Reverse Shell
+<details>
+  <summary>Expand to see details</summary>
+
+Summary: Simulate reverse shell on Bastion. 
+
+Systems used:
+
+  - User PC - 192.168.91.132 (Windows 10 using MS Terminal ssh)
+  - Bastion - 192.168.91.129 (Debian12)
+  - Defended - 192.168.91.133 (Debian12)
+
+<details>
+<summary>Setup SSH Reverse Shell</summary>
+
+```bash
+$ ssh -N -R 2222:localhost:22 root@192.168.91.129
+```
+On Bastion observe before and after netstat output
+Before:
+
+```bash
+bob@bastion:~$ sudo netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      5268/sshd: /usr/sbi 
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      988/cupsd           
+tcp6       0      0 :::22                   :::*                    LISTEN      5268/sshd: /usr/sbi 
+tcp6       0      0 ::1:631                 :::*                    LISTEN      988/cupsd           
+```
+
+After:
+
+```bash
+bob@bastion:~$ sudo netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      5268/sshd: /usr/sbi 
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      988/cupsd           
+tcp        0      0 0.0.0.0:2222            0.0.0.0:*               LISTEN      5996/sshd: root     <--- Reverse Shell
+tcp        0      0 192.168.91.129:22       192.168.91.133:59798    ESTABLISHED 5996/sshd: root     
+tcp6       0      0 :::22                   :::*                    LISTEN      5268/sshd: /usr/sbi 
+tcp6       0      0 :::2222                 :::*                    LISTEN      5996/sshd: root     
+tcp6       0      0 ::1:631                 :::*                    LISTEN      988/cupsd               
+```
+</details>
+
+
+Connect from UserPC to Bastion on port 2222
+
+```bash
+$ ssh -p 2222 bastion
+```
+
+<details>
+<summary>PCAP Filter - updates!</summary>
+
+```bash
+tcpdump -ni ens33 'tcp and (port 22 and port 2222)' -w scenario07.pcap
+```
+</details>
+
+Conclusion:
+
+Similar to previous scenarios, chacha20-poly1305 is the chosen algorithm. Each keystroke is 36 bytes. However, since this is a reverse shell, we have SSH over SSH. Each keystroke on UserPC is echoed to a psuedo tty (shell) on the defended server. The PCAP will show each SSH Payload to be 76 bytes, because this is 'double' encrypted + HMAC. The JA4+SSH fingerprint value accurately represents this scenario.
+
+```json
+$ ja4 scenario07.pcap -J
+analyst@watchingu:~$ ja4 scenario07.pcap -J
+{
+    "stream": 0,
+    "src": "192.168.91.133",
+    "dst": "192.168.91.129",
+    "srcport": "59798",
+    "dstport": "22",
+    "client_ttl": "64",
+    "server_ttl": "64",
+    "JA4L-S": "9_64",
+    "JA4L-C": "251_64",
+    "ssh_extras": {
+        "hassh": "aae6b9604f6f3356543709a376d7f657",
+        "hassh_server": "a65c3b91f743d3f246e72172e77288f1",
+        "ssh_protocol_client": "SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u3",
+        "ssh_protocol_server": "SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u3",
+        "encryption_algorithm": "chacha20-poly1305@openssh.com"
+    },
+    "JA4SSH.1": "c44s40_c10s10_c9s5",
+    "JA4SSH.2": "c84s52_c11s9_c6s7",
+    "JA4SSH.3": "c76s76_c10s10_c0s10",
+    "JA4SSH.4": "c76s76_c10s10_c0s10",
+    "JA4SSH.5": "c76s76_c10s10_c0s10",
+    "JA4SSH.6": "c76s76_c10s10_c0s10",
+    "JA4SSH.7": "c76s76_c10s10_c0s10"
+}
+{
+    "stream": 1,
+    "src": "192.168.91.132",
+    "dst": "192.168.91.129",
+    "srcport": "51213",
+    "dstport": "2222",
+    "client_ttl": "128",
+    "server_ttl": "64",
+    "JA4L-S": "9_64",
+    "JA4L-C": "1412_128"
+}
+```
+
+| JA4+SSH Value    | Simulated Activity       |
+|----------------|----------------|
+|  c36s36_c10s10_c10s0 | Forward Interactive Shell   |
+|  c1460s36_c185s15_c4s131 | Unauthorized SCP to Bastion  |
+|  c60s1460_c0s200_c10s0  | Data Exfiltration from Bastion      |
+|  c76s76_c10s10_c0s10    | Reverse Shell |
+
+</details>
