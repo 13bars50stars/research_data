@@ -374,29 +374,39 @@ On Bastion observe before and after netstat output
 Before:
 
 ```bash
-bob@bastion:~$ sudo netstat -antp
+$ sudo netstat -antp
 Active Internet connections (servers and established)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      5268/sshd: /usr/sbi 
-tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      988/cupsd           
-tcp6       0      0 :::22                   :::*                    LISTEN      5268/sshd: /usr/sbi 
-tcp6       0      0 ::1:631                 :::*                    LISTEN      988/cupsd           
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      795/sshd: /usr/sbin 
+tcp6       0      0 :::22                   :::*                    LISTEN      795/sshd: /usr/sbin 
 ```
 
-After:
+After reverse shell established:
 
 ```bash
-bob@bastion:~$ sudo netstat -antp
+$ sudo netstat -antp
 Active Internet connections (servers and established)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      5268/sshd: /usr/sbi 
-tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      988/cupsd           
-tcp        0      0 0.0.0.0:2222            0.0.0.0:*               LISTEN      5996/sshd: root     <--- Reverse Shell
-tcp        0      0 192.168.91.129:22       192.168.91.133:59798    ESTABLISHED 5996/sshd: root     
-tcp6       0      0 :::22                   :::*                    LISTEN      5268/sshd: /usr/sbi 
-tcp6       0      0 :::2222                 :::*                    LISTEN      5996/sshd: root     
-tcp6       0      0 ::1:631                 :::*                    LISTEN      988/cupsd               
+tcp        0      0 0.0.0.0:2222            0.0.0.0:*               LISTEN      3708/sshd: root     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      795/sshd: /usr/sbin 
+tcp        0      0 192.168.91.129:22       192.168.91.133:59190    ESTABLISHED 3708/sshd: root     
+tcp6       0      0 :::2222                 :::*                    LISTEN      3708/sshd: root     
+tcp6       0      0 :::22                   :::*                    LISTEN      795/sshd: /usr/sbin 
 ```
+
+After connection from UserPC
+```bash
+$ sudo netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:2222            0.0.0.0:*               LISTEN      3708/sshd: root     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      795/sshd: /usr/sbin 
+tcp        0      0 192.168.91.129:2222     192.168.91.132:51477    ESTABLISHED 3708/sshd: root     
+tcp        0      0 192.168.91.129:22       192.168.91.133:59190    ESTABLISHED 3708/sshd: root     
+tcp6       0      0 :::2222                 :::*                    LISTEN      3708/sshd: root     
+tcp6       0      0 :::22                   :::*                    LISTEN      795/sshd: /usr/sbin 
+```
+
 </details>
 
 
@@ -410,7 +420,7 @@ $ ssh -p 2222 bastion
 <summary>PCAP Filter - updates!</summary>
 
 ```bash
-tcpdump -ni ens33 'tcp and (port 22 and port 2222)' -w scenario07.pcap
+tcpdump -ni ens33 'tcp and (port 22 or port 2222)' -w scenario07.pcap
 ```
 </details>
 
@@ -422,14 +432,14 @@ Similar to previous scenarios, chacha20-poly1305 is the chosen algorithm. Each k
 $ ja4 scenario07.pcap -J
 {
     "stream": 0,
-    "src": "192.168.91.133",
-    "dst": "192.168.91.129",
-    "srcport": "59798",
+    "src": "192.168.91.133",  (Defended)
+    "dst": "192.168.91.129",  (Bastion)
+    "srcport": "59190",
     "dstport": "22",
     "client_ttl": "64",
     "server_ttl": "64",
     "JA4L-S": "9_64",
-    "JA4L-C": "251_64",
+    "JA4L-C": "549_64",
     "ssh_extras": {
         "hassh": "aae6b9604f6f3356543709a376d7f657",
         "hassh_server": "a65c3b91f743d3f246e72172e77288f1",
@@ -438,23 +448,29 @@ $ ja4 scenario07.pcap -J
         "encryption_algorithm": "chacha20-poly1305@openssh.com"
     },
     "JA4SSH.1": "c44s40_c10s10_c9s5",
-    "JA4SSH.2": "c84s52_c11s9_c6s7",
+    "JA4SSH.2": "c84s52_c11s9_c7s5",
     "JA4SSH.3": "c76s76_c10s10_c0s10",
     "JA4SSH.4": "c76s76_c10s10_c0s10",
     "JA4SSH.5": "c76s76_c10s10_c0s10",
     "JA4SSH.6": "c76s76_c10s10_c0s10",
-    "JA4SSH.7": "c76s76_c10s10_c0s10"
+    "JA4SSH.7": "c76s76_c10s10_c0s10",
+    "JA4SSH.8": "c76s76_c10s10_c0s10",
+    "JA4SSH.9": "c76s76_c10s10_c0s10",
+    "JA4SSH.10": "c76s76_c10s10_c0s10",
+    "JA4SSH.11": "c76s76_c10s10_c0s10",
+    "JA4SSH.12": "c76s76_c10s10_c0s10",
+    "JA4SSH.13": "c76s76_c0s0_c0s1"
 }
 {
     "stream": 1,
-    "src": "192.168.91.132",
-    "dst": "192.168.91.129",
-    "srcport": "51213",
+    "src": "192.168.91.132",   (UserPC)
+    "dst": "192.168.91.129",   (Bastion)
+    "srcport": "51477",
     "dstport": "2222",
     "client_ttl": "128",
     "server_ttl": "64",
     "JA4L-S": "9_64",
-    "JA4L-C": "1412_128"
+    "JA4L-C": "2325_128"
 }
 ```
 
